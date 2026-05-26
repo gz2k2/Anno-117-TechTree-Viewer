@@ -38,7 +38,7 @@ jobs:
 
       - name: Build EXE with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --icon "icon.ico" --name "Anno117_TechTree_Viewer" --add-data "kofi5.webp;." --add-data "techbg.jpg;." --add-data "version.txt;." --add-data "icon.ico;." Anno117_TechTree_Viewer.py
+          pyinstaller --onefile --windowed --icon "a117ttv.ico" --name "Anno117_TechTree_Viewer" --add-data "kofi5.webp;." --add-data "techbg.jpg;." --add-data "version.txt;." --add-data "a117ttv.ico;." Anno117_TechTree_Viewer.py
 
       - name: Create Release
         id: create_release
