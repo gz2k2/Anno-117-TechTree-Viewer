@@ -29,12 +29,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install PyQt6 pyinstaller
 
-      - name: Read Version from File
+      - name: Read Version and Changelog
         id: get_version
         shell: pwsh
         run: |
           $v = Get-Content version.txt -Raw
           echo "VERSION=$($v.Trim())" >> $env:GITHUB_OUTPUT
+          
+          # Read changelog and handle multiline output for GitHub Actions
+          $changelog = Get-Content changelog.txt -Raw
+          echo "CHANGELOG<<EOF" >> $env:GITHUB_OUTPUT
+          echo $changelog >> $env:GITHUB_OUTPUT
+          echo "EOF" >> $env:GITHUB_OUTPUT
 
       - name: Build EXE with PyInstaller
         run: |
@@ -51,12 +57,14 @@ jobs:
           prerelease: ${{ github.ref_type != 'tag' }}
           generate_release_notes: true
           body: |
-            Automatischer Build der Version ${{ steps.get_version.outputs.VERSION }}.
-            
-            ### Änderungen
-            Siehe automatische Release-Notes unten oder Commit-Historie.
+            Automatic build of version ${{ steps.get_version.outputs.VERSION }}.
+
+            ${{ steps.get_version.outputs.CHANGELOG }}
+
+            ### Changes
+            See the automatic release notes below or the commit history.
             
             ### Download
-            Die ausführbare Datei findest du unten bei den Assets.
+            You can find the executable file in the Assets section below.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

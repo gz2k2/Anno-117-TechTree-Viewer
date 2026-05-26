@@ -100,6 +100,7 @@ class AppConfig:
             "Economy": [-4.0, 1.0, 1.0],
             "Military": [4.0, 1.0, 1.0],
         }
+        self.default_language: str = "english"
 
         if getattr(sys, "frozen", False):
             # Wenn kompiliert (EXE), Pfad der ausführbaren Datei nutzen
@@ -121,6 +122,7 @@ class AppConfig:
                 data = json.load(f)
                 self.xml_root_path = data.get("xml_root_path", "")
                 self.category_offsets = data.get("category_offsets", self.category_offsets)
+                self.default_language = data.get("default_language", "")
 
         except Exception:
             pass
@@ -133,6 +135,7 @@ class AppConfig:
         data = {
             "xml_root_path": self.xml_root_path,
             "category_offsets": self.category_offsets,
+            "default_language": self.default_language,
         }
 
         try:
@@ -924,9 +927,10 @@ class TechTreeView(QGraphicsView):
 class OptionsDialog(QDialog):
     """Dialog for application settings."""
 
-    def __init__(self, config: AppConfig, parent: QWidget | None = None):
+    def __init__(self, config: AppConfig, languages: list[str], parent: QWidget | None = None):
 
         super().__init__(parent)
+
         self._config = config
         self.setWindowTitle("Options")
         self.setMinimumWidth(500)
@@ -943,6 +947,22 @@ class OptionsDialog(QDialog):
 
         path_group.addWidget(self._path_edit)
         path_group.addWidget(browse_btn)
+
+        # Default Language selection
+        layout.addWidget(QLabel("<b>Default Language:</b>"))
+        self._default_lang_combo = QComboBox()
+        self._default_lang_combo.addItem("") # None / Auto
+
+        for lang in languages:
+            self._default_lang_combo.addItem(lang)
+
+        # Set current selection
+        idx = self._default_lang_combo.findText(self._config.default_language)
+
+        if idx >= 0:
+            self._default_lang_combo.setCurrentIndex(idx)
+
+        layout.addWidget(self._default_lang_combo)
 
         # Category Offsets Table
         layout.addWidget(QLabel("<b>Category Offsets:</b>"))
@@ -1005,6 +1025,8 @@ class OptionsDialog(QDialog):
     def _on_save_clicked(self) -> None:
 
         self._config.xml_root_path = self._path_edit.text()
+        self._config.default_language = self._default_lang_combo.currentText()
+
 
         # Update offsets from table
         new_offsets = {}
@@ -1545,7 +1567,8 @@ class TechTreeWindow(QMainWindow):
 
     def _on_options_clicked(self) -> None:
 
-        dlg = OptionsDialog(self._config, self)
+        langs = sorted(list(self._available_languages.keys()))
+        dlg = OptionsDialog(self._config, languages=langs, parent=self)
 
         if dlg.exec() == QDialog.DialogCode.Accepted:
             # After saving new options, try to reload automatically
@@ -1590,8 +1613,14 @@ class TechTreeWindow(QMainWindow):
             pass
 
 
-        # Try to default to english or the first available
-        if "english" in self._available_languages:
+        # Try to default to config, then english, then first available
+        default_lang = self._config.default_language
+
+        if default_lang and default_lang in self._available_languages:
+            idx = self._language_dropdown.findText(default_lang)
+            self._language_dropdown.setCurrentIndex(idx)
+
+        elif "english" in self._available_languages:
             idx = self._language_dropdown.findText("english")
             self._language_dropdown.setCurrentIndex(idx)
 
