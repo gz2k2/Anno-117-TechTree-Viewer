@@ -44,24 +44,6 @@ from PyQt6.QtWidgets import (
 
 
 
-def _get_app_version() -> str:
-    """Reads the version from version.txt for consistent UI labeling."""
-    v_file = get_resource_path("version.txt")
-    if v_file.exists():
-        return v_file.read_text(encoding="utf-8").strip()
-    return "unknown"
-
-
-APP_NAME = f"Anno 117 TechTree Viewer v{_get_app_version()}"
-
-
-################################################################################
-# GLOBAL VARIABLES
-################################################################################
-
-
-CONFIG_FILE = "a117ttv_config.json"
-
 
 ################################################################################
 # UTILITIES
@@ -77,6 +59,27 @@ def get_resource_path(relative_path: str | Path) -> Path:
         return Path(sys._MEIPASS) / relative_path
 
     return Path(__file__).parent / relative_path
+
+
+def _get_app_version() -> str:
+    """Reads the version from version.txt for consistent UI labeling."""
+
+    v_file = get_resource_path("version.txt")
+
+    if v_file.exists():
+        return v_file.read_text(encoding="utf-8").strip()
+
+    return "unknown"
+
+
+################################################################################
+# GLOBAL CONSTANTS
+################################################################################
+
+
+CONFIG_FILE = "a117ttv_config.json"
+
+APP_NAME = f"Anno 117 TechTree Viewer v{_get_app_version()}"
 
 
 
@@ -1371,7 +1374,7 @@ class TechTreeWindow(QMainWindow):
         self.setWindowTitle(APP_NAME)
         self.resize(1200, 800)
 
-        icon_path = get_resource_path("icon.ico")
+        icon_path = get_resource_path("a117ttv.ico")
         if icon_path.exists():
             self.setWindowIcon(QIcon(str(icon_path)))
 

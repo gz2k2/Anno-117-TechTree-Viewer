@@ -9,7 +9,7 @@
                 "--onefile",
                 "--windowed",
                 "--icon",
-                "icon.ico",
+                "a117ttv.ico",
                 "--name",
                 "Anno117_TechTree_Viewer",
                 "--add-data",
@@ -19,7 +19,7 @@
                 "--add-data",
                 "version.txt;.",
                 "--add-data",
-                "icon.ico;.",
+                "a117ttv.ico;.",
                 "Anno117_TechTree_Viewer.py"
             ],
             "group": {
