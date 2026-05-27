@@ -44,7 +44,15 @@ from PyQt6.QtWidgets import (
 
 
 
-APP_NAME = "Anno 117 TechTree Viewer v0.5.1 beta"
+def _get_app_version() -> str:
+    """Reads the version from version.txt for consistent UI labeling."""
+    v_file = get_resource_path("version.txt")
+    if v_file.exists():
+        return v_file.read_text(encoding="utf-8").strip()
+    return "unknown"
+
+
+APP_NAME = f"Anno 117 TechTree Viewer v{_get_app_version()}"
 
 
 ################################################################################
@@ -53,6 +61,24 @@ APP_NAME = "Anno 117 TechTree Viewer v0.5.1 beta"
 
 
 CONFIG_FILE = "a117ttv_config.json"
+
+
+################################################################################
+# UTILITIES
+################################################################################
+
+def get_resource_path(relative_path: str | Path) -> Path:
+    """
+    Resolves the absolute path for resources. 
+    Handles both normal execution and PyInstaller's temporary directory.
+    """
+
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        return Path(sys._MEIPASS) / relative_path
+
+    return Path(__file__).parent / relative_path
+
+
 
 
 ################################################################################
@@ -691,12 +717,7 @@ class TechTreeView(QGraphicsView):
 
         super().__init__(parent)
 
-        if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-            bg_path = Path(sys._MEIPASS) / "techbg.jpg"
-
-        else:
-            bg_path = Path(__file__).parent / "techbg.jpg"
-
+        bg_path = get_resource_path("techbg.jpg")
         if bg_path.exists():
             self.setBackgroundBrush(QBrush(QPixmap(str(bg_path))))
 
@@ -1440,8 +1461,7 @@ class TechTreeWindow(QMainWindow):
         self._kofi_button.setFixedHeight(30)  # Kontrolliert die Höhe des Buttons
         self._kofi_button.setIconSize(QSize(100, 40))  # Kontrolliert die Größe der Grafik im Button
         self._kofi_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl("https://ko-fi.com/gz2k2")))
-
-        kofi_path = (Path(sys._MEIPASS) if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS") else Path(__file__).parent) / "kofi5.webp"
+        kofi_path = get_resource_path("kofi5.webp")
 
         if kofi_path.exists():
             self._kofi_button.setIcon(QIcon(str(kofi_path)))

@@ -29,24 +29,32 @@ jobs:
           python -m pip install --upgrade pip
           pip install PyQt6 pyinstaller
 
+      - name: Read Version from File
+        id: get_version
+        shell: pwsh
+        run: |
+          $v = Get-Content version.txt -Raw
+          echo "VERSION=$($v.Trim())" >> $env:GITHUB_OUTPUT
+
       - name: Build EXE with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --name "Anno117_TechTree_Viewer" --add-data "kofi5.webp;." --add-data "techbg.jpg;." Anno117_TechTree_Viewer.py
+          pyinstaller --onefile --windowed --name "Anno117_TechTree_Viewer" --add-data "kofi5.webp;." --add-data "techbg.jpg;." --add-data "version.txt;." Anno117_TechTree_Viewer.py
 
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
           files: dist/Anno117_TechTree_Viewer.exe
-          name: Release ${{ github.ref_name }}
-          tag_name: ${{ github.ref }}
+          name: v${{ steps.get_version.outputs.VERSION }}
+          tag_name: v${{ steps.get_version.outputs.VERSION }}
           draft: false
-          prerelease: false
+          prerelease: ${{ github.ref_type != 'tag' }}
+          generate_release_notes: true
           body: |
             Automatischer Build der Version ${{ github.ref_name }}.
             
             ### Änderungen
-            - Siehe Commit-Historie.
+            Siehe automatische Release-Notes unten oder Commit-Historie.
             
             ### Download
             Die ausführbare Datei findest du unten bei den Assets.
