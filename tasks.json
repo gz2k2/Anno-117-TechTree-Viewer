@@ -9,7 +9,7 @@
                 "--onefile",
                 "--windowed",
                 "--icon",
-                "icon.ico",
+                "a117ttv.ico",
                 "--name",
                 "Anno117_TechTree_Viewer",
                 "--add-data",
