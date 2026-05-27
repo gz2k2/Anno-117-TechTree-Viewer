@@ -1,0 +1,26 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Anno 117 TechTree Viewer EXE",
+            "type": "shell",
+            "command": "pyinstaller",
+            "args": [
+                "--onefile",
+                "--windowed",
+                "--name",
+                "Anno117_TechTree_Viewer",
+                "--add-data",
+                "kofi5.webp;.",
+                "--add-data",
+                "techbg.jpg;.",
+                "Anno117_TechTree_Viewer.py"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}
