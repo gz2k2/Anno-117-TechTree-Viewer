@@ -44,7 +44,7 @@ from PyQt6.QtWidgets import (
 
 
 
-APP_NAME = "Anno 117 TechTree Viewer v0.1.0 beta"
+APP_NAME = "Anno 117 TechTree Viewer v0.5.1 beta"
 
 
 ################################################################################
