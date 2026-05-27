@@ -1,8 +1,15 @@
-Anno117_TechTree_Viewer copy 2.py
-Anno117_TechTree_Viewer copy.py
-TechTree.zip
-style_py.md
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# Build & PyInstaller
+dist/
+build/
+*.spec
+
+# Lokale Konfiguration & Binaries
 a117ttv_config.json
-LICENSE
-REAMDE.md
-requirements.txt
+*.exe
+*.log
