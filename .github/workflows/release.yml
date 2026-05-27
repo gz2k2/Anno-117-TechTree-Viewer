@@ -1,0 +1,51 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger bei Tags wie v1.0, v0.1.0-beta, etc.
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install PyQt6 pyinstaller
+
+      - name: Build EXE with PyInstaller
+        run: |
+          pyinstaller --onefile --windowed --name "Anno117_TechTree_Viewer" --add-data "kofi5.webp;." --add-data "techbg.jpg;." Anno117_TechTree_Viewer.py
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/Anno117_TechTree_Viewer.exe
+          name: Release ${{ github.ref_name }}
+          tag_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+          body: |
+            Automatischer Build der Version ${{ github.ref_name }}.
+            
+            ### Änderungen
+            - Siehe Commit-Historie.
+            
+            ### Download
+            Die ausführbare Datei findest du unten bei den Assets.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
