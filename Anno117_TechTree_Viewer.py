@@ -1371,6 +1371,10 @@ class TechTreeWindow(QMainWindow):
         self.setWindowTitle(APP_NAME)
         self.resize(1200, 800)
 
+        icon_path = get_resource_path("icon.ico")
+        if icon_path.exists():
+            self.setWindowIcon(QIcon(str(icon_path)))
+
         self.setStyleSheet("""
             QMainWindow, QWidget {
                 background-color: #CBAB94;

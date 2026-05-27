@@ -8,6 +8,8 @@
             "args": [
                 "--onefile",
                 "--windowed",
+                "--icon",
+                "icon.ico",
                 "--name",
                 "Anno117_TechTree_Viewer",
                 "--add-data",
@@ -16,6 +18,8 @@
                 "techbg.jpg;.",
                 "--add-data",
                 "version.txt;.",
+                "--add-data",
+                "icon.ico;.",
                 "Anno117_TechTree_Viewer.py"
             ],
             "group": {

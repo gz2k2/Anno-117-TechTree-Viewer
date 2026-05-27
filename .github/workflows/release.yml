@@ -38,20 +38,20 @@ jobs:
 
       - name: Build EXE with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --name "Anno117_TechTree_Viewer" --add-data "kofi5.webp;." --add-data "techbg.jpg;." --add-data "version.txt;." Anno117_TechTree_Viewer.py
+          pyinstaller --onefile --windowed --icon "icon.ico" --name "Anno117_TechTree_Viewer" --add-data "kofi5.webp;." --add-data "techbg.jpg;." --add-data "version.txt;." --add-data "icon.ico;." Anno117_TechTree_Viewer.py
 
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
           files: dist/Anno117_TechTree_Viewer.exe
-          name: v${{ steps.get_version.outputs.VERSION }}
-          tag_name: v${{ steps.get_version.outputs.VERSION }}
+          name: ${{ github.ref_type == 'tag' && format('v{0}', steps.get_version.outputs.VERSION) || format('Development Build - v{0}', steps.get_version.outputs.VERSION) }}
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || 'latest' }}
           draft: false
           prerelease: ${{ github.ref_type != 'tag' }}
           generate_release_notes: true
           body: |
-            Automatischer Build der Version ${{ github.ref_name }}.
+            Automatischer Build der Version ${{ steps.get_version.outputs.VERSION }}.
             
             ### Änderungen
             Siehe automatische Release-Notes unten oder Commit-Historie.
