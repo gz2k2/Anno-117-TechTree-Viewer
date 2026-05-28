@@ -94,7 +94,7 @@ class AppConfig:
     def __init__(self):
 
         self.xml_root_path: str = ""
-        self.use_internal_files: bool = False
+        self.use_internal_files: bool = True
         self.category_offsets: dict[str, list[float]] = {
             "Civic": [0.0, 2.0, 3.0],
             "DLC01": [0.0, -1.0, 1.0],
