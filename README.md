@@ -28,8 +28,9 @@ If this tool helps you, I would appreciate a coffee!
 
  <a href="https://ko-fi.com/gz2k2" target="_blank"><img src="data/ui/kofi5.webp" alt="Buy Me A Coffee" style="height: 36px !important;width: 120px !important;"></a>
 
----
 *Note: This is a fan project and is not affiliated with Ubisoft.*
+
+---
 
 # Anno 117 TechTree Viewer (Deutsch)
 
@@ -59,5 +60,4 @@ Wenn dir dieses Tool hilft, freue ich mich über einen Kaffee!
 
  <a href="https://ko-fi.com/gz2k2" target="_blank"><img src="data/ui/kofi5.webp" alt="Buy Me A Coffee" style="height: 36px !important;width: 120px !important;"></a>
 
----
 *Hinweis: Dies ist ein Fan-Projekt und steht in keiner Verbindung zu Ubisoft.*
