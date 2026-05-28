@@ -94,6 +94,7 @@ class AppConfig:
     def __init__(self):
 
         self.xml_root_path: str = ""
+        self.use_internal_files: bool = False
         self.category_offsets: dict[str, list[float]] = {
             "Civic": [0.0, 2.0, 3.0],
             "DLC01": [0.0, -1.0, 1.0],
@@ -121,6 +122,7 @@ class AppConfig:
             with self._path.open("r", encoding="utf-8") as f:
                 data = json.load(f)
                 self.xml_root_path = data.get("xml_root_path", "")
+                self.use_internal_files = data.get("use_internal_files", False)
                 self.category_offsets = data.get("category_offsets", self.category_offsets)
                 self.default_language = data.get("default_language", "")
 
@@ -134,6 +136,7 @@ class AppConfig:
 
         data = {
             "xml_root_path": self.xml_root_path,
+            "use_internal_files": self.use_internal_files,
             "category_offsets": self.category_offsets,
             "default_language": self.default_language,
         }
@@ -723,7 +726,7 @@ class TechTreeView(QGraphicsView):
 
         super().__init__(parent)
 
-        bg_path = get_resource_path("techbg.jpg")
+        bg_path = get_resource_path("data/ui/techbg.jpg")
         if bg_path.exists():
             self.setBackgroundBrush(QBrush(QPixmap(str(bg_path))))
 
@@ -942,11 +945,15 @@ class OptionsDialog(QDialog):
         self._path_edit = QLineEdit(self._config.xml_root_path)
         self._path_edit.setPlaceholderText("Select root folder for XML files...")
         
-        browse_btn = QPushButton("Browse")
-        browse_btn.clicked.connect(self._on_browse_clicked)
+        self._use_internal_cb = QCheckBox("Use internal Files (Patch v1.5.1)")
+        self._use_internal_cb.setChecked(self._config.use_internal_files)
+        self._use_internal_cb.toggled.connect(self._update_path_widgets)
+
+        self._browse_btn = QPushButton("Browse")
+        self._browse_btn.clicked.connect(self._on_browse_clicked)
 
         path_group.addWidget(self._path_edit)
-        path_group.addWidget(browse_btn)
+        path_group.addWidget(self._browse_btn)
 
         # Default Language selection
         layout.addWidget(QLabel("<b>Default Language:</b>"))
@@ -1006,10 +1013,16 @@ class OptionsDialog(QDialog):
 
         btn_layout.addWidget(cancel_btn)
 
-        layout.addWidget(QLabel("<b>XML Root Directory:</b>"))
+        path_header_layout = QHBoxLayout()
+        path_header_layout.addWidget(QLabel("<b>XML Root Directory:</b>"))
+        path_header_layout.addStretch(1)
+        path_header_layout.addWidget(self._use_internal_cb)
+
+        layout.addLayout(path_header_layout)
         layout.addLayout(path_group)
         layout.addStretch(1)
         layout.addLayout(btn_layout)
+        self._update_path_widgets()
 
     def _on_browse_clicked(self) -> None:
 
@@ -1022,9 +1035,16 @@ class OptionsDialog(QDialog):
         if dir_path:
             self._path_edit.setText(dir_path)
 
+    def _update_path_widgets(self) -> None:
+        """Disables manual path selection if internal files are used."""
+        is_manual = not self._use_internal_cb.isChecked()
+        self._path_edit.setEnabled(is_manual)
+        self._browse_btn.setEnabled(is_manual)
+
     def _on_save_clicked(self) -> None:
 
         self._config.xml_root_path = self._path_edit.text()
+        self._config.use_internal_files = self._use_internal_cb.isChecked()
         self._config.default_language = self._default_lang_combo.currentText()
 
 
@@ -1128,8 +1148,8 @@ class DetailsPanel(QWidget):
             btn.clicked.connect(callback)
 
             header_layout.addWidget(header_label)
-            header_layout.addWidget(btn)
             header_layout.addStretch(1)
+            header_layout.addWidget(btn)
 
             root_layout.addLayout(header_layout)
             root_layout.addWidget(value_label)
@@ -1396,7 +1416,7 @@ class TechTreeWindow(QMainWindow):
         self.setWindowTitle(APP_NAME)
         self.resize(1200, 800)
 
-        icon_path = get_resource_path("a117ttv.ico")
+        icon_path = get_resource_path("data/ui/a117ttv.ico")
         if icon_path.exists():
             self.setWindowIcon(QIcon(str(icon_path)))
 
@@ -1460,7 +1480,7 @@ class TechTreeWindow(QMainWindow):
         self._details_scroll.setWidget(self._details)
         self._details_scroll.setWidgetResizable(True)
 
-        self._details_scroll.setFixedWidth(300)
+        self._details_scroll.setFixedWidth(250)
 
         self._asset_values_by_guid: dict[str, str] = {}
         self._available_languages: dict[str, Path] = {}
@@ -1490,7 +1510,7 @@ class TechTreeWindow(QMainWindow):
         self._kofi_button.setFixedHeight(30)  # Kontrolliert die Höhe des Buttons
         self._kofi_button.setIconSize(QSize(100, 40))  # Kontrolliert die Größe der Grafik im Button
         self._kofi_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl("https://ko-fi.com/gz2k2")))
-        kofi_path = get_resource_path("kofi5.webp")
+        kofi_path = get_resource_path("data/ui/kofi5.webp")
 
         if kofi_path.exists():
             self._kofi_button.setIcon(QIcon(str(kofi_path)))
@@ -1534,7 +1554,7 @@ class TechTreeWindow(QMainWindow):
     def _initialize_data(self) -> None:
         """Attempts to load data from config."""
 
-        if self._config.xml_root_path:
+        if self._config.use_internal_files or self._config.xml_root_path:
             found = self._try_find_assets_from_config()
             
             if found:
@@ -1547,13 +1567,17 @@ class TechTreeWindow(QMainWindow):
     def _try_find_assets_from_config(self) -> bool:
         """Searches for assets.xml based on config settings."""
 
-        root = Path(self._config.xml_root_path)
+        if self._config.use_internal_files:
+            root = get_resource_path("data/base")
+        else:
+            if not self._config.xml_root_path:
+                return False
+            root = Path(self._config.xml_root_path)
 
         if not root.exists():
             return False
 
         pattern = "**/assets.xml"
-        
         try:
             for p in root.glob(pattern):
                 self._assets_xml_path = p
@@ -1590,16 +1614,20 @@ class TechTreeWindow(QMainWindow):
     def _update_language_list(self) -> None:
         """Scans folder for texts_*.xml and populates the dropdown."""
 
-        if not self._config.xml_root_path:
+        if not self._config.use_internal_files and not self._config.xml_root_path:
             return
 
         self._available_languages.clear()
         self._language_dropdown.blockSignals(True)
         self._language_dropdown.clear()
 
+        if self._config.use_internal_files:
+            root = get_resource_path("data/base")
+        else:
+            root = Path(self._config.xml_root_path)
 
-        root = Path(self._config.xml_root_path)
         if not root.exists():
+            self._language_dropdown.blockSignals(False)
             return
 
         try:

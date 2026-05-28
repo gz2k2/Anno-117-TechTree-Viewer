@@ -1,5 +1,0 @@
-### Changelog
-* Added "Default Language" option in the settings menu.
-* Improved UI layout stability for tech tree nodes.
-* Fixed path resolution issues in compiled builds.
-* General performance improvements and code cleanup.

@@ -37,14 +37,14 @@ jobs:
           echo "VERSION=$($v.Trim())" >> $env:GITHUB_OUTPUT
           
           # Read changelog and handle multiline output for GitHub Actions
-          $changelog = Get-Content changelog.txt -Raw
+          $changelog = Get-Content changelog.md -Raw
           echo "CHANGELOG<<EOF" >> $env:GITHUB_OUTPUT
           echo $changelog >> $env:GITHUB_OUTPUT
           echo "EOF" >> $env:GITHUB_OUTPUT
 
       - name: Build EXE with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --icon "a117ttv.ico" --name "Anno117_TechTree_Viewer" --add-data "kofi5.webp;." --add-data "techbg.jpg;." --add-data "version.txt;." --add-data "a117ttv.ico;." Anno117_TechTree_Viewer.py
+          pyinstaller --onefile --windowed --icon "data/ui/a117ttv.ico" --name "Anno117_TechTree_Viewer" --add-data "data/ui/kofi5.webp;data/ui" --add-data "data/ui/techbg.jpg;data/ui" --add-data "version.txt;." --add-data "data/ui/a117ttv.ico;data/ui" --add-data "data/base;data/base" Anno117_TechTree_Viewer.py
 
       - name: Create Release
         id: create_release
