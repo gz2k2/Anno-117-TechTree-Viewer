@@ -79,7 +79,7 @@ def _get_app_version() -> str:
 
 CONFIG_FILE = "a117ttv_config.json"
 
-APP_NAME = f"Anno 117 TechTree Viewer v{_get_app_version()}"
+APP_NAME = f"Anno 117 TechTree Viewer by gz2k2 v{_get_app_version()}"
 
 
 
@@ -945,7 +945,7 @@ class OptionsDialog(QDialog):
         self._path_edit = QLineEdit(self._config.xml_root_path)
         self._path_edit.setPlaceholderText("Select root folder for XML files...")
         
-        self._use_internal_cb = QCheckBox("Use internal Files (Patch v1.5.1)")
+        self._use_internal_cb = QCheckBox("Use internal Files (Patch v1.5.2)")
         self._use_internal_cb.setChecked(self._config.use_internal_files)
         self._use_internal_cb.toggled.connect(self._update_path_widgets)
 
